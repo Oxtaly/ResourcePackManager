@@ -43,121 +43,99 @@ public final class ModCommands {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             final LiteralCommandNode<ServerCommandSource> node = dispatcher.register(
                 CommandManager.literal("resourcepackmanager")
-                    .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.base", 2))
-                    .then(CommandManager.literal("reload")
-                            .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.reload", 4))
-                            .executes(ctx -> reloadConfig(ctx.getSource()))
-                    )
-                    .then(CommandManager.literal("resend")
-                            .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.resend", 2))
-                            .executes((ctx) -> resendPack(ctx.getSource(), ctx.getSource().getServer().getPlayerManager().getPlayerList()))
-                            .then(CommandManager.argument("players", EntityArgumentType.players())
-                                    .executes((ctx) -> resendPack(ctx.getSource(), EntityArgumentType.getPlayers(ctx,"players")))
-                            )
-                    )
-                    .then(CommandManager.literal("sendpack")
-                            .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.sendpack", 2))
-                            .then(CommandManager.argument("players", EntityArgumentType.players())
-                                    .then(CommandManager.argument("URL", StringArgumentType.string())
-                                            .executes((ctx) -> sendResourcePack(
-                                                    ctx.getSource(),
-                                                    EntityArgumentType.getPlayers(ctx,"players"),
-                                                    StringArgumentType.getString(ctx, "URL"),
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    null
-                                            ))
-                                            .then(CommandManager.argument("UUID", StringArgumentType.string())
-                                                    .executes((ctx) -> sendResourcePack(
-                                                            ctx.getSource(),
-                                                            EntityArgumentType.getPlayers(ctx,"players"),
-                                                            StringArgumentType.getString(ctx, "URL"),
-                                                            StringArgumentType.getString(ctx, "UUID"),
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            null
-                                                    ))
-                                                    .then(CommandManager.argument("SHA1", StringArgumentType.string())
-                                                            .executes((ctx) -> sendResourcePack(
-                                                                    ctx.getSource(),
-                                                                    EntityArgumentType.getPlayers(ctx,"players"),
-                                                                    StringArgumentType.getString(ctx, "URL"),
-                                                                    StringArgumentType.getString(ctx, "UUID"),
-                                                                    StringArgumentType.getString(ctx, "SHA1"),
-                                                                    null,
-                                                                    null,
-                                                                    null
-                                                            ))
-                                                            .then(CommandManager.argument("Prompt", StringArgumentType.string())
-                                                                    .executes((ctx) -> sendResourcePack(
-                                                                            ctx.getSource(),
-                                                                            EntityArgumentType.getPlayers(ctx,"players"),
-                                                                            StringArgumentType.getString(ctx, "URL"),
-                                                                            StringArgumentType.getString(ctx, "UUID"),
-                                                                            StringArgumentType.getString(ctx, "SHA1"),
-                                                                            StringArgumentType.getString(ctx, "Prompt"),
-                                                                            null,
-                                                                            null
-                                                                    ))
-                                                                    .then(CommandManager.argument("Forced", BoolArgumentType.bool())
-                                                                            .executes((ctx) -> sendResourcePack(
-                                                                                    ctx.getSource(),
-                                                                                    EntityArgumentType.getPlayers(ctx,"players"),
-                                                                                    StringArgumentType.getString(ctx, "URL"),
-                                                                                    StringArgumentType.getString(ctx, "UUID"),
-                                                                                    StringArgumentType.getString(ctx, "SHA1"),
-                                                                                    StringArgumentType.getString(ctx, "Prompt"),
-                                                                                    BoolArgumentType.getBool(ctx, "Forced"),
-                                                                                    null
-                                                                            ))
-                                                                            .then(CommandManager.argument("ComputeSHA1", BoolArgumentType.bool())
-                                                                                    .executes((ctx) -> sendResourcePack(
-                                                                                            ctx.getSource(),
-                                                                                            EntityArgumentType.getPlayers(ctx,"players"),
-                                                                                            StringArgumentType.getString(ctx, "URL"),
-                                                                                            StringArgumentType.getString(ctx, "UUID"),
-                                                                                            StringArgumentType.getString(ctx, "SHA1"),
-                                                                                            StringArgumentType.getString(ctx, "Prompt"),
-                                                                                            BoolArgumentType.getBool(ctx, "Forced"),
-                                                                                            BoolArgumentType.getBool(ctx, "ComputeSHA1")
-                                                                                    ))
-                                                                            )
-                                                                    )
-                                                            )
-                                                    )
-                                            )
-                                   )
-                            )
-                    )
-                    // .then(CommandManager.literal("set")
-                    //         .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.set", 4))
-                    //         .then(CommandManager.literal("time_until_afk")
-                    //                 .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.set.time_until_afk", 4))
-                    //                 .then(CommandManager.argument("value", IntegerArgumentType.integer(-1, 2147483647))
-                    //                         .suggests((ctx, builder) -> {
-                    //                             builder.suggest(-1);
-                    //                             builder.suggest(ConfigData.DEFAULT.timeUntilAfk);
-                    //                             builder.suggest(ResourcePackManager.CONFIG_MANAGER.getData().timeUntilAfk);
-                    //                             return builder.buildFuture();
-                    //                         })
-                    //                         .executes(ctx -> setTimeUntilAfk(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "value")))
-                    //                 )
-                    //         )
-                    //         .then(CommandManager.literal("afk_placeholder")
-                    //                 .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.set.afk_placeholder", 4))
-                    //                 .then(CommandManager.argument("value", StringArgumentType.string())
-                    //                         .suggests((ctx, builder) -> {
-                    //                             builder.suggest("\"" + ConfigData.DEFAULT.afkPlaceholder + "\"");
-                    //                             builder.suggest("\"" + ResourcePackManager.CONFIG_MANAGER.getData().afkPlaceholder + "\"");
-                    //                             return builder.buildFuture();
-                    //                         })
-                    //                         .executes(ctx -> setAfkPlaceholder(ctx.getSource(), StringArgumentType.getString(ctx, "value")))
-                    //                 )
-                    //         )
-                    // )
+                        .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.base", 2))
+                        .then(CommandManager.literal("reload")
+                                .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.reload", 4))
+                                .executes(ctx -> reloadConfig(ctx.getSource()))
+                        )
+                        .then(CommandManager.literal("recomputesha1")
+                                .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.recomputesha1", 2))
+                                .executes((ctx) -> recomputeSHA1(ctx.getSource()))
+                        )
+                        .then(CommandManager.literal("resend")
+                                .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.resend", 2))
+                                .executes((ctx) -> resendPack(ctx.getSource(), ctx.getSource().getServer().getPlayerManager().getPlayerList()))
+                                .then(CommandManager.argument("players", EntityArgumentType.players())
+                                        .executes((ctx) -> resendPack(ctx.getSource(), EntityArgumentType.getPlayers(ctx,"players")))
+                                )
+                        )
+                        .then(CommandManager.literal("sendpack")
+                                .requires(source -> Permissions.check(source, "resourcepackmanager.command.resourcepackmanager.sendpack", 2))
+                                .then(CommandManager.argument("players", EntityArgumentType.players())
+                                        .then(CommandManager.argument("URL", StringArgumentType.string())
+                                                .executes((ctx) -> sendResourcePack(
+                                                        ctx.getSource(),
+                                                        EntityArgumentType.getPlayers(ctx,"players"),
+                                                        StringArgumentType.getString(ctx, "URL"),
+                                                        null,
+                                                        null,
+                                                        null,
+                                                        null,
+                                                        null
+                                                ))
+                                                .then(CommandManager.argument("UUID", StringArgumentType.string())
+                                                        .executes((ctx) -> sendResourcePack(
+                                                                ctx.getSource(),
+                                                                EntityArgumentType.getPlayers(ctx,"players"),
+                                                                StringArgumentType.getString(ctx, "URL"),
+                                                                StringArgumentType.getString(ctx, "UUID"),
+                                                                null,
+                                                                null,
+                                                                null,
+                                                                null
+                                                        ))
+                                                        .then(CommandManager.argument("SHA1", StringArgumentType.string())
+                                                                .executes((ctx) -> sendResourcePack(
+                                                                        ctx.getSource(),
+                                                                        EntityArgumentType.getPlayers(ctx,"players"),
+                                                                        StringArgumentType.getString(ctx, "URL"),
+                                                                        StringArgumentType.getString(ctx, "UUID"),
+                                                                        StringArgumentType.getString(ctx, "SHA1"),
+                                                                        null,
+                                                                        null,
+                                                                        null
+                                                                ))
+                                                                .then(CommandManager.argument("Prompt", StringArgumentType.string())
+                                                                        .executes((ctx) -> sendResourcePack(
+                                                                                ctx.getSource(),
+                                                                                EntityArgumentType.getPlayers(ctx,"players"),
+                                                                                StringArgumentType.getString(ctx, "URL"),
+                                                                                StringArgumentType.getString(ctx, "UUID"),
+                                                                                StringArgumentType.getString(ctx, "SHA1"),
+                                                                                StringArgumentType.getString(ctx, "Prompt"),
+                                                                                null,
+                                                                                null
+                                                                        ))
+                                                                        .then(CommandManager.argument("Forced", BoolArgumentType.bool())
+                                                                                .executes((ctx) -> sendResourcePack(
+                                                                                        ctx.getSource(),
+                                                                                        EntityArgumentType.getPlayers(ctx,"players"),
+                                                                                        StringArgumentType.getString(ctx, "URL"),
+                                                                                        StringArgumentType.getString(ctx, "UUID"),
+                                                                                        StringArgumentType.getString(ctx, "SHA1"),
+                                                                                        StringArgumentType.getString(ctx, "Prompt"),
+                                                                                        BoolArgumentType.getBool(ctx, "Forced"),
+                                                                                        null
+                                                                                ))
+                                                                                .then(CommandManager.argument("ComputeSHA1", BoolArgumentType.bool())
+                                                                                        .executes((ctx) -> sendResourcePack(
+                                                                                                ctx.getSource(),
+                                                                                                EntityArgumentType.getPlayers(ctx,"players"),
+                                                                                                StringArgumentType.getString(ctx, "URL"),
+                                                                                                StringArgumentType.getString(ctx, "UUID"),
+                                                                                                StringArgumentType.getString(ctx, "SHA1"),
+                                                                                                StringArgumentType.getString(ctx, "Prompt"),
+                                                                                                BoolArgumentType.getBool(ctx, "Forced"),
+                                                                                                BoolArgumentType.getBool(ctx, "ComputeSHA1")
+                                                                                        ))
+                                                                                )
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                       )
+                                )
+                        )
             );
             dispatcher.register(
                     CommandManager.literal("rpm")
@@ -240,32 +218,63 @@ public final class ModCommands {
         }
     }
 
+    public static int recomputeSHA1(ServerCommandSource source) {
+        ConfigData config = ResourcePackManager.CONFIG_MANAGER.getData();
+
+        if(!config.enableMod) {
+            source.sendError(Utils.minecraftLogBuilder.error("Mod is disabled in the config!"));
+            return 0;
+        }
+
+        if(!config.computeResourcePackSHA1FromResourcePack) {
+            source.sendError(Utils.minecraftLogBuilder.error("'computeResourcePackSHA1FromResourcePack' is disabled in the config!"));
+            return 0;
+        }
+        if(config.resourcePackURL.isEmpty() || !Utils.isValidURL(config.resourcePackURL)) {
+            source.sendError(Utils.minecraftLogBuilder.error("Empty or invalid URL provided in the config!"));
+            return 0;
+        }
+
+        try {
+            config.computedResourcePackSHA1 = Utils.computeSHA1FromURLFile(config.resourcePackURL);
+            ResourcePackManager.LOGGER.debug(String.format("Recomputed pack SHA1 successfully! (%s)", config.computedResourcePackSHA1));
+            source.sendFeedback(() -> Utils.minecraftLogBuilder.log(String.format("Recomputed pack SHA1 successfully! (%s)", config.computedResourcePackSHA1)), true);
+            return 1;
+        } catch (Exception e) {
+            String fallback = config.resourcePackSHA1.isEmpty() ? "resource_pack_sha1 value" : "SHA1 of the URL (not the file)";
+            source.sendError(Utils.minecraftLogBuilder.error("An error happened trying to recompute SHA1 for resource pack! Is your URL a valid file? SHA1 will fallback to " + fallback + "."));
+            ResourcePackManager.LOGGER.error("An error happened trying to recompute SHA1 for resource pack! Is your URL a valid file? SHA1 will fallback to " + fallback + ".", e);
+            return 0;
+        }
+    }
+
     public static int resendPack(ServerCommandSource source, Collection<ServerPlayerEntity> targets) {
         ConfigData config = ResourcePackManager.CONFIG_MANAGER.getData();
 
-        if(config.enableMod) {
-            try {
-                if(config.resourcePackURL.isEmpty()) {
-                    source.sendError(Utils.minecraftLogBuilder.error("Missing/invalid resource pack URL provided in the config!"));
-                    return 0;
-                }
-                if(config.resourcePackUUID == null) {
-                    source.sendError(Utils.minecraftLogBuilder.error("Invalid resource pack UUID provided in the config! Remove the config value or provide a correct UUID."));
-                    return 0;
-                }
+        if(!config.enableMod) {
+            source.sendError(Utils.minecraftLogBuilder.error("Mod is disabled in the config!"));
+            return 0;
+        }
 
-                ResourcePackManagerAPI.sendConfigResourcePack(targets);
-
-                source.sendFeedback(() -> Utils.minecraftLogBuilder.log(String.format("Resent pack to %s player(s) successfully!", targets.size())), true);
-                return 1;
-            } catch (Exception e) {
-                source.sendError(Utils.minecraftLogBuilder.error("An error happened trying to resend resource pack"));
-                ResourcePackManager.LOGGER.error(String.format("An error happened trying to re-send resource pack to %s players!", targets.size()), e);
+        try {
+            if(config.resourcePackURL.isEmpty()) {
+                source.sendError(Utils.minecraftLogBuilder.error("Missing/invalid resource pack URL provided in the config!"));
                 return 0;
             }
+            if(config.resourcePackUUID == null) {
+                source.sendError(Utils.minecraftLogBuilder.error("Invalid resource pack UUID provided in the config! Remove the config value or provide a correct UUID."));
+                return 0;
+            }
+
+            ResourcePackManagerAPI.sendConfigResourcePack(targets);
+
+            source.sendFeedback(() -> Utils.minecraftLogBuilder.log(String.format("Resent pack to %s player(s) successfully!", targets.size())), true);
+            return 1;
+        } catch (Exception e) {
+            source.sendError(Utils.minecraftLogBuilder.error("An error happened trying to resend resource pack"));
+            ResourcePackManager.LOGGER.error(String.format("An error happened trying to re-send resource pack to %s players!", targets.size()), e);
+            return 0;
         }
-        source.sendError(Utils.minecraftLogBuilder.error("Mod is disabled in the config!"));
-        return 0;
     }
 
     public static int sendResourcePack(
