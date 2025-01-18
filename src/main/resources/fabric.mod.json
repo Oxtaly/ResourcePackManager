@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "resourcepackmanager",
+	"version": "${version}",
+	"name": "ResourcePackManager",
+	"description": "A small mod to change/resend a texture pack to your players live",
+	"authors": [
+		"@Oxtaly"
+	],
+	"contact": {
+		"homepage": "https://github.com/Oxtaly/ResourcePackManager",
+		"sources": "https://github.com/Oxtaly/ResourcePackManager"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/resourcepackmanager/icon.png",
+	"environment": "server",
+	"entrypoints": {
+		"main": [
+			"com.oxtaly.resourcepackmanager.ResourcePackManager"
+		]
+	},
+	"mixins": [
+		"resourcepackmanager.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.9",
+		"minecraft": ">=1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
